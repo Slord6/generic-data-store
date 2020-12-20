@@ -7,15 +7,6 @@ const createServer = (requestHandler) => {
     return http.createServer(requestHandler);
 }
 
-const urlToDbName = (url) => {
-
-}
-
-const setHeaders = (res, statusCode) => {
-    res.setHeader("Content-type", 'application/json');
-    res.statusCode = statusCode;
-}
-
 const appendDebug = (res, req, data) => {
     const debug = [
         data,
@@ -38,9 +29,9 @@ const queryParamsToObject = (queryParams) => {
     return queryObj;
 }
 
-const handleGet = (req, res, url, body) => {
+const handleGet = (req, res, dbName, body) => {
     if(body.find) {
-        const db = jsondb(url.pathName);
+        const db = jsondb(dbName);
         const records = db.find(body.find);
         if(records.length > 0) {
             res.statusCode = 200;
@@ -53,9 +44,9 @@ const handleGet = (req, res, url, body) => {
         return res.end("GET request must have find property")
     }
 };
-const handlePut = (req, res, url, body) => {
+const handlePut = (req, res, dbName, body) => {
     if(body.data && body.find) {
-        const db = jsondb(url.pathName);
+        const db = jsondb(dbName);
         db.update(body.find, body.data);
         res.statusCode = 200;
         return res.end();
@@ -64,8 +55,8 @@ const handlePut = (req, res, url, body) => {
         return res.end("PUT request must have find and data properties")
     }
 };
-const handlePost = (req, res, url, body) => {
-    const db = jsondb(url.pathName);
+const handlePost = (req, res, dbName, body) => {
+    const db = jsondb(dbName);
     const preexisting = db.find(body);
     if(preexisting.length > 0) {
         res.statusCode = 409;
@@ -76,9 +67,9 @@ const handlePost = (req, res, url, body) => {
         res.end();
     }
 };
-const handleDelete = (req, res, url, body) => {
+const handleDelete = (req, res, dbName, body) => {
     if(body.find) {
-        const db = jsondb(url.pathName);
+        const db = jsondb(dbName);
         const matching = db.find(body.find);
         db.delete(body.find);
         res.statusCode = 200;
@@ -91,8 +82,11 @@ const handleDelete = (req, res, url, body) => {
 
 const handleRequest = (req, res) => {
     const parsedUrl = url.parse(req.url);
+    const dbName = parsedUrl.pathname.slice(1, parsedUrl.pathname.length);
     const queryParams = queryParamsToObject(parsedUrl.query);
     
+    console.log(req.method + ": " + dbName);
+
     if(!auth.validateKey(queryParams.key)) {
         res.statusCode = 403;
         res.end('Unauthorised');
@@ -112,16 +106,16 @@ const handleRequest = (req, res) => {
         }
         switch (req.method) {
             case 'GET':
-                handleGet(req, res, parsedUrl, body);
+                handleGet(req, res, dbName, body);
                 break;
             case 'POST':
-                handlePost(req, res, parsedUrl, body);
+                handlePost(req, res, dbName, body);
                 break;
             case 'PUT':
-                handlePut(req, res, parsedUrl, body);
+                handlePut(req, res, dbName, body);
                 break;
             case 'DELETE':
-                handleDelete(req, res, parsedUrl, body);
+                handleDelete(req, res, dbName, body);
                 break;
             default:
                 res.statusCode = 501;
