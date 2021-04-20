@@ -106,21 +106,18 @@ const handleRequest = (req, res) => {
         }
         switch (req.method) {
             case 'GET':
-                handleGet(req, res, dbName, body);
-                break;
+            case 'SEARCH':
+                return handleGet(req, res, dbName, body);
             case 'POST':
-                handlePost(req, res, dbName, body);
-                break;
+                return handlePost(req, res, dbName, body);
             case 'PUT':
-                handlePut(req, res, dbName, body);
-                break;
+                return handlePut(req, res, dbName, body);
             case 'DELETE':
-                handleDelete(req, res, dbName, body);
-                break;
+                return handleDelete(req, res, dbName, body);
             default:
                 res.statusCode = 501;
                 res.end(`METHOD NOT IMPLEMENTED; ${req.method}`);
-                break;
+                return;
         }
         res.statusCode = 500;
         appendDebug(res, req, 'Server mishandled request');

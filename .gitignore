@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+
+# For testing, store all databases under /databases, ignore 'em
+/databases/*
