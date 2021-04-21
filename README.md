@@ -30,10 +30,9 @@ To get a record(s), send a JSON body with the `find` property set to any valid [
 
 The SEARCH verb can be used as a replacement for the GET verb for libraries that are tetchy about GET requests with a body.
 
-
 ### POST
 
-To create a new record, POST the new data to the database endpoint. If the data conflicts with existing records you'll get a `409` back with a body of the conflicting records.
+To create a new record, POST the new data to the database endpoint. If the data conflicts with existing records you'll get a `409` back with a body of the conflicting records, otherwise a `200` with the created record in the body.
 
 ### PUT
 
@@ -45,6 +44,8 @@ To update a record, PUT the (optionally partial) updated record data to the data
     "find": {"types": ["electric"]},
     "data": {"friendsWith": "Pikachu"}
 }
+
+Returns `200` status with modified records in the body when successful, and a `404` when no matching records were found.
 ```
 
 ### DELETE

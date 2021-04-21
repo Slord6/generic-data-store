@@ -48,8 +48,7 @@ const handlePut = (req, res, dbName, body) => {
     if(body.data && body.find) {
         const db = jsondb(dbName);
         db.update(body.find, body.data);
-        res.statusCode = 200;
-        return res.end();
+        return handleGet(req, res, dbName, body);
     } else {
         res.statusCode = 400;
         return res.end("PUT request must have find and data properties")
@@ -63,8 +62,7 @@ const handlePost = (req, res, dbName, body) => {
         return res.end(`Conflict with existing record(s): ${JSON.stringify(preexisting)}`);
     } else {
         db.create(body);
-        res.statusCode = 200;
-        res.end();
+        return handleGet(req, res, dbName, {find:body});
     }
 };
 const handleDelete = (req, res, dbName, body) => {
