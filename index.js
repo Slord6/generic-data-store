@@ -65,7 +65,23 @@ const handlePost = (req, res, dbName, body) => {
         return handleGet(req, res, dbName, {find:body});
     }
 };
+const handleDeleteNoBody = (req, res, dbName) => {
+    console.log('0-length body delete');
+    // Parse out query paramaters
+    // Then filter to get just the 'json' param
+    // hand off to normal delete handler with value as body
+    const pathSplit = req.url.split('?');
+    let jsonParam = pathSplit[1].split('&').map(param => {
+        let keyVal = param.split('=');
+        return {key: keyVal[0], value: keyVal[1]};
+    }).filter(param => param.key.toLowerCase() == 'json');
+    if(jsonParam.length !== 1) return res.end(JSON.stringify({error: 'No delete info in request'}));
+    jsonParam = jsonParam[0];
+    handleDelete(req, res, dbName, JSON.parse(jsonParam.value));
+};
 const handleDelete = (req, res, dbName, body) => {
+    if(body == null || body == '') return handleDeleteNoBody(req, res, dbName);
+
     if(body.find) {
         const db = jsondb(dbName);
         const matching = db.find(body.find);
@@ -99,7 +115,9 @@ const handleRequest = (req, res) => {
     req.on('end', () => {
         console.log('Body', body);
         try {
-            body = JSON.parse(body);
+            if(req.method != 'DELETE') {
+                body = JSON.parse(body);
+            }
         } catch (error) {
             res.statusCode = 400;
             console.error('400: Invalid JSON', body);
