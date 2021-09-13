@@ -90,7 +90,7 @@ const handleDelete = (req, res, dbName, body) => {
         res.end(JSON.stringify(matching));
     } else {
         res.statusCode = 400;
-        return res.end("DELETE request must have find property")
+        return res.end(JSON.stringify({error: "DELETE request must have find property"}));
     }
 };
 
