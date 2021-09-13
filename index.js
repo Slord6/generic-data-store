@@ -123,4 +123,4 @@ const handleRequest = (req, res) => {
 
 }
 
-createServer(handleRequest).listen(9012);
+createServer(handleRequest).listen(process.env.PORT || 9012);
