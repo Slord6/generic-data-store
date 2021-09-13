@@ -88,6 +88,7 @@ const handleRequest = (req, res) => {
     if(!auth.validateKey(queryParams.key)) {
         res.statusCode = 403;
         res.end('Unauthorised');
+        console.log('403: Unauthorised');
         return;
     }
     
@@ -100,6 +101,7 @@ const handleRequest = (req, res) => {
             body = JSON.parse(body);
         } catch (error) {
             res.statusCode = 400;
+            console.error('400: Invalid JSON', body);
             return res.end("Valid JSON body required for all methods to this server\r\n" + body);
         }
         switch (req.method) {
